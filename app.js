@@ -24,6 +24,11 @@ class VotingEligibilityChecker {
             return { isValid: false, error: 'Age must contain only numbers' };
         }
 
+        // Check for leading zeros (like "030")
+        if (trimmedAge.length > 1 && trimmedAge.startsWith('0')) {
+            return { isValid: false, error: 'Age cannot have leading zeros' };
+        }
+
         const age = parseInt(trimmedAge, 10);
 
         // Check if it's a valid number and within reasonable range
@@ -35,48 +40,71 @@ class VotingEligibilityChecker {
     }
 
     checkEligibility(citizenship, ageInput) {
-        // Validate citizenship first
+        const errors = [];
+        let age = null;
+        let isCitizen = citizenship === 'yes';
+        
+        // Validate citizenship
         const citizenshipValidation = this.validateCitizenship(citizenship);
         if (!citizenshipValidation.isValid) {
-            return { 
-                eligible: false, 
-                error: citizenshipValidation.error,
-                field: 'citizenship'
-            };
+            errors.push({
+                field: 'citizenship',
+                message: citizenshipValidation.error
+            });
         }
 
         // Validate age
         const ageValidation = this.validateAge(ageInput);
         if (!ageValidation.isValid) {
-            return { 
-                eligible: false, 
-                error: ageValidation.error,
-                field: 'age'
+            errors.push({
+                field: 'age',
+                message: ageValidation.error
+            });
+        } else {
+            age = ageValidation.age;
+        }
+
+        // If there are validation errors, return them all
+        if (errors.length > 0) {
+            return {
+                eligible: false,
+                errors: errors,
+                hasValidationErrors: true
             };
         }
 
-        const age = ageValidation.age;
+        // Check eligibility criteria (both must be true)
+        const eligibilityErrors = [];
+        
+        if (!isCitizen) {
+            eligibilityErrors.push({
+                field: 'citizenship',
+                message: '❌ You must be a South African citizen to vote'
+            });
+        }
+        
+        if (age < 18) {
+            eligibilityErrors.push({
+                field: 'age',
+                message: '❌ You must be 18 years or older to vote'
+            });
+        }
 
-        // Check voting eligibility
-        if (citizenship === 'yes' && age >= 18) {
-            return { 
-                eligible: true, 
-                message: '✅ You are eligible to vote in South Africa!',
-                field: null
-            };
-        } else if (citizenship !== 'yes') {
-            return { 
-                eligible: false, 
-                error: '❌ You are not eligible to vote: You must be a South African citizen',
-                field: 'citizenship'
-            };
-        } else if (age < 18) {
-            return { 
-                eligible: false, 
-                error: '❌ You are not eligible to vote: You must be 18 years or older',
-                field: 'age'
+        // If there are eligibility errors, return them all
+        if (eligibilityErrors.length > 0) {
+            return {
+                eligible: false,
+                errors: eligibilityErrors,
+                hasValidationErrors: false
             };
         }
+
+        // All conditions met - eligible to vote
+        return {
+            eligible: true,
+            message: '✅ You are eligible to vote in South Africa!',
+            errors: []
+        };
     }
 
     displayResult(result) {
@@ -87,20 +115,34 @@ class VotingEligibilityChecker {
         // Clear previous errors
         citizenshipError.textContent = '';
         ageError.textContent = '';
+        citizenshipError.style.display = 'none';
+        ageError.style.display = 'none';
 
         if (result.eligible) {
             resultDiv.className = 'result success';
             resultDiv.textContent = result.message;
+            resultDiv.style.display = 'block';
         } else {
             resultDiv.className = 'result error';
-            resultDiv.textContent = result.error;
             
-            // Display field-specific error
-            if (result.field === 'citizenship') {
-                citizenshipError.textContent = result.error;
-            } else if (result.field === 'age') {
-                ageError.textContent = result.error;
+            // Display all errors
+            if (result.errors && result.errors.length > 0) {
+                // Create a combined error message
+                const errorMessages = result.errors.map(err => err.message).join(' ');
+                resultDiv.textContent = errorMessages;
+                
+                // Also show field-specific errors
+                result.errors.forEach(error => {
+                    if (error.field === 'citizenship') {
+                        citizenshipError.textContent = error.message;
+                        citizenshipError.style.display = 'block';
+                    } else if (error.field === 'age') {
+                        ageError.textContent = error.message;
+                        ageError.style.display = 'block';
+                    }
+                });
             }
+            resultDiv.style.display = 'block';
         }
     }
 
@@ -119,12 +161,14 @@ class VotingEligibilityChecker {
             // Clear errors when user starts typing/selecting
             document.getElementById('age').addEventListener('input', () => {
                 document.getElementById('ageError').textContent = '';
+                document.getElementById('ageError').style.display = 'none';
                 document.getElementById('result').style.display = 'none';
             });
 
             document.querySelectorAll('input[name="citizenship"]').forEach(radio => {
                 radio.addEventListener('change', () => {
                     document.getElementById('citizenshipError').textContent = '';
+                    document.getElementById('citizenshipError').style.display = 'none';
                     document.getElementById('result').style.display = 'none';
                 });
             });
