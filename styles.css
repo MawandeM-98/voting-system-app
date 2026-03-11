@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #808080 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -20,15 +20,22 @@ body {
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     max-width: 500px;
     width: 90%;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
 }
 
 h1 {
-    color: #333;
+    color: #1e3c72;
     text-align: center;
     margin-bottom: 30px;
     font-size: 24px;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid linear-gradient(90deg, #1e3c72, #808080);
     padding-bottom: 15px;
+    background: linear-gradient(90deg, #1e3c72, #2a5298, #808080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .form-group {
@@ -38,7 +45,7 @@ h1 {
 label {
     display: block;
     margin-bottom: 10px;
-    color: #555;
+    color: #1e3c72;
     font-weight: 600;
     font-size: 16px;
 }
@@ -55,44 +62,52 @@ label {
     gap: 8px;
     font-weight: normal;
     cursor: pointer;
+    color: #333;
 }
 
 input[type="radio"] {
     width: 18px;
     height: 18px;
     cursor: pointer;
+    accent-color: #1e3c72;
 }
 
 input[type="text"] {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #ddd;
+    border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
+    background: #f8f9fa;
 }
 
 input[type="text"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #1e3c72;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
 }
 
 .check-btn {
     width: 100%;
     padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e3c72, #2a5298, #4a4a4a);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s;
+    background-size: 200% 200%;
+    animation: gradient 5s ease infinite;
 }
 
 .check-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 20px rgba(30, 60, 114, 0.3);
+    background: linear-gradient(135deg, #2a5298, #1e3c72, #5a5a5a);
 }
 
 .check-btn:active {
@@ -100,10 +115,15 @@ input[type="text"]:focus {
 }
 
 .error-message {
-    color: #e74c3c;
+    color: #dc3545;
     font-size: 14px;
     margin-top: 5px;
     min-height: 20px;
+    display: none;
+    padding: 5px 10px;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #dc3545;
 }
 
 .result {
@@ -114,18 +134,139 @@ input[type="text"]:focus {
     font-size: 20px;
     font-weight: 600;
     display: none;
+    animation: slideIn 0.3s ease;
 }
 
 .result.success {
     display: block;
-    background: #d4edda;
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
     color: #155724;
     border: 2px solid #c3e6cb;
+    box-shadow: 0 5px 15px rgba(21, 87, 36, 0.2);
 }
 
 .result.error {
     display: block;
-    background: #f8d7da;
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
     color: #721c24;
     border: 2px solid #f5c6cb;
+    box-shadow: 0 5px 15px rgba(114, 28, 36, 0.2);
+}
+
+/* Animations */
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px;
+        margin: 20px;
+    }
+    
+    h1 {
+        font-size: 20px;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .check-btn {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    .result {
+        font-size: 16px;
+        padding: 15px;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(135deg, #1e3c72, #808080);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #2a5298, #4a4a4a);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #1e3c72, #5a5a5a);
+}
+
+/* Loading animation for button */
+.check-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    animation: none;
+}
+
+/* Focus styles for accessibility */
+input[type="radio"]:focus-visible,
+input[type="text"]:focus-visible,
+.check-btn:focus-visible {
+    outline: 3px solid #1e3c72;
+    outline-offset: 2px;
+}
+
+/* Error state for inputs */
+input[type="text"].error {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+}
+
+input[type="text"].error:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Success state for result */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.result.success {
+    animation: slideIn 0.3s ease, pulse 2s ease infinite;
 }
